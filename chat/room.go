@@ -1,10 +1,9 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
+	"github.com/avalchev94/go_blueprints/trace"
 	"github.com/gorilla/websocket"
+	"net/http"
 )
 
 type room struct {
@@ -17,6 +16,8 @@ type room struct {
 	leave chan *client
 	// holds all current clients in this room
 	clients map[*client]bool
+	// tracer will recieve information of activity in the room.
+	tracer trace.Tracer
 }
 
 func newRoom() *room {
@@ -34,20 +35,25 @@ func (r *room) run() {
 		case client := <-r.join:
 			// joining
 			r.clients[client] = true
+			r.tracer.Trace("New client joined.")
 		case client := <-r.leave:
 			// leaving
 			delete(r.clients, client)
 			close(client.send)
+			r.tracer.Trace("Client left.")
 		case msg := <-r.forward:
+			r.tracer.Trace("Message: \"", string(msg), "\"")
 			// forward the message to all clients
 			for client := range r.clients {
 				select {
 				case client.send <- msg:
 					// the message was sent successfuly
+					r.tracer.Trace("-- sent to client")
 				default:
 					// failed to sent
 					delete(r.clients, client)
 					close(client.send)
+					r.tracer.Trace(" -- failed to send, cleaned up client")
 				}
 			}
 		}
@@ -65,7 +71,7 @@ var upgrader = &websocket.Upgrader{ReadBufferSize: socketBufferSize,
 func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	socket, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
-		log.Fatal("ServeHTTP:", err)
+		r.tracer.Trace("ServeHTTP:", err)
 		return
 	}
 	client := &client{
