@@ -14,6 +14,8 @@ import (
 	"text/template"
 )
 
+var avatars Avatar = UseGravatar
+
 const (
 	templateFolder = "templates"
 )
@@ -59,7 +61,7 @@ func main() {
 			"http://localhost:8080/auth/callback/facebook"),
 	)
 
-	r := newRoom(UseFileSystemAvatar)
+	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
