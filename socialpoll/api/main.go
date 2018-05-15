@@ -61,23 +61,6 @@ func isValidAPIKey(key string) bool {
 	return key == "abc123"
 }
 
-func withData(d *mgo.Session, f http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		thisDB := d.Copy()
-		defer thisDB.Close()
-		SetVar(r, "db", thisDB.DB("ballots"))
-		f(w, r)
-	}
-}
-
-func withVars(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		OpenVars(r)
-		defer CloseVars(r)
-		fn(w, r)
-	}
-}
-
 func withCORS(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
