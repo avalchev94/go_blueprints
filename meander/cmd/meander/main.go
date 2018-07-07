@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	meander.APIKey = "AIzaSyC6zE-AQjJBAhNXysAcT1wpPMgiP6MTFBA"
+	meander.APIKey = "KEY"
 	http.HandleFunc("/journeys", cors(func(w http.ResponseWriter, r *http.Request) {
 		respond(w, r, meander.Journeys)
 	}))
