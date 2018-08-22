@@ -2,6 +2,7 @@ package vault
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -103,7 +104,6 @@ type Endpoints struct {
 	ValidateEndpoint endpoint.Endpoint
 }
 
-/*
 func (e Endpoints) Hash(ctx context.Context, password string) (string, error) {
 	req := hashRequest{Password: password}
 	resp, err := e.HashEndpoint(ctx, req)
@@ -129,4 +129,3 @@ func (e Endpoints) Validate(ctx context.Context, password, hash string) (bool, e
 	}
 	return validateResp.Valid, nil
 }
-*/
