@@ -1,0 +1,6 @@
+application: demistify-212411
+dispatch:
+- url: "*/api/*"
+  module: api
+- url: "*/*"
+  module: web
